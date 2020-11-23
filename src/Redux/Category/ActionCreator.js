@@ -1,6 +1,8 @@
 import * as ActionTypes from './ActionTypes'
 import {baseURL} from '../../baseURL'
 
+// FETCHING CATEGORY
+
 export const categorySuccess = (category) => {
     return {
         type: ActionTypes.CATEGORY_SUCCESS,
@@ -44,4 +46,48 @@ export const fetchCategories = () => {
         })
         .catch(err=> dispatch(categoryFailed(err)))
     }
+}
+
+//  ADDING CATEGORY
+
+export const addCategoryLoading = () =>{
+    return {
+        type: ActionTypes.ADD_CATEGORY_LOADING
+    }
+}
+
+export const addCategoryFailed = (errMess) => {
+    return {
+        type: ActionTypes.ADD_CATEGORY_FAILED,
+        payload: errMess
+    }
+}
+
+export const addCategory = (category, token) => (dispatch) =>{
+    dispatch(addCategoryLoading())
+    return fetch(baseURL + 'category', {
+        method: 'POST',
+        body: category,
+        headers: {
+            //'Content-Type': 'multipart/form-data',
+            'Authorization': `bearer ${token}`
+        }
+    })
+    .then(response => {
+        if(response.ok){
+            return response
+        }
+        else{
+            var error = new Error('Error ' + response.status + ':'+response.statusText)
+            error.response = response
+            throw error
+        }
+    },
+    error => {
+        throw error
+    })
+    .then(res => res.json())
+    .then(res => {dispatch(fetchCategories())
+                console.log('Category added successfully', res)})
+    .catch(err => dispatch(addCategoryFailed(err.message)))
 }
