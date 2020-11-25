@@ -1,7 +1,8 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import Layout from '../../Components/Layout/Layout'
 import {Modal, Button, Row, Col, Form} from 'react-bootstrap'
-import {useSelector} from 'react-redux'
+import {useSelector, useDispatch} from 'react-redux'
+import {fetchProducts} from '../../Redux/Product/ActionCreator'
 
 function Products() {
 
@@ -12,7 +13,15 @@ function Products() {
     const [category, setCategory] = useState('')
     const [showModal, setShowModal] = useState(false)
 
-    const Categories = useSelector(state => state.category.categories)
+    const token = localStorage.getItem('token')
+
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+        dispatch(fetchProducts(token))
+    }, [])
+
+    const Categories = Object.values(useSelector(state => state.category.categories))
 
     const CategorySelect = Categories.map((cat)=>{
         return <option key={cat._id} value={cat._id}>{cat.name}</option>
